@@ -1,0 +1,141 @@
+{
+    "variables": {
+      "boot_wait": "5s",
+      "disk_size": "40960",
+      "iso_checksum_type": "sha1",
+      "iso_checksum": "62564786f5568b40385abb40a1a9bb889f3576c7",
+      "iso_url": "https://software-download.microsoft.com/pr/Win10_1803_French_x64.iso?t=7f84cbdf-5d98-4460-932e-387bd399491b&e=1525251776&h=54b8ccc9016f647bb02f3bcb6571b366",
+      "memsize": "2048",
+      "numvcpus": "2",
+      "vm_name": "Win10_1803",
+      "winrm_password" : "packer",
+      "winrm_username" : "packer"
+    },
+    "builders": [
+        {
+          "type": "vmware-iso",
+          "guest_os_type": "windows9srv-64",
+          "vm_name":"{{user `vm_name`}}",
+          "tools_upload_flavor": "",
+          "boot_wait": "{{user `boot_wait`}}",
+          "disk_size": "{{user `disk_size`}}",
+          "disk_type_id": "0",
+          "headless": false,
+          "http_directory": "http",
+          "iso_checksum_type": "{{user `iso_checksum_type`}}",
+          "iso_checksum": "{{user `iso_checksum`}}",
+          "iso_url": "{{user `iso_url`}}",
+          "communicator":"winrm",
+          "winrm_username": "{{user `winrm_username`}}",
+          "winrm_password": "{{user `winrm_password`}}",
+          "winrm_use_ssl": true,
+          "winrm_insecure": true,
+          "winrm_timeout": "4h",
+          "floppy_files": [
+            "scripts/autounattend.xml"
+          ],
+          "shutdown_command": "shutdown /s /t 10 /f /d p:4:1 /c \"Packer Shutdown\"",
+          "shutdown_timeout": "30m",
+          "skip_compaction": false,
+          "vmx_data": {
+            "memsize": "{{user `memsize`}}",
+            "numvcpus": "{{user `numvcpus`}}",
+            "virtualHW.version": "14",
+            "scsi0.virtualDev": "lsisas1068"
+          }
+        },
+        {
+            "type": "virtualbox-iso",
+            "guest_os_type": "Windows2016_64",
+            "vm_name": "{{user `vm_name`}}",
+            "iso_url": "{{user `iso_url`}}",
+            "iso_checksum_type": "{{user `iso_checksum_type`}}",
+            "iso_checksum": "{{user `iso_checksum`}}",
+            "guest_additions_mode": "upload",
+            "guest_additions_path": "c:/Windows/Temp/windows.iso",
+            "headless": false,
+            "boot_wait": "{{user `boot_wait`}}",
+            "disk_size": "{{user `disk_size`}}",
+            "communicator":"winrm",
+            "winrm_username": "{{user `winrm_username`}}",
+            "winrm_password": "{{user `winrm_password`}}",
+            "winrm_use_ssl": true,
+            "winrm_insecure": true,
+            "winrm_timeout": "4h",
+            "floppy_files": [
+                "scripts/autounattend.xml"
+              ],
+            "shutdown_command": "shutdown /s /t 10 /f /d p:4:1 /c \"Packer Shutdown\"",
+            "shutdown_timeout": "30m",
+            "vboxmanage": [
+              ["modifyvm", "{{.Name}}", "--memory", "{{user `memsize`}}"],
+              ["modifyvm", "{{.Name}}", "--cpus", "{{user `numvcpus`}}"]
+            ]
+        }
+    ],
+    "provisioners": [
+      {
+        "type": "windows-restart",
+        "restart_timeout": "30m"
+      },
+      {
+        "type": "powershell",
+        "only": ["vmware-iso"],
+        "scripts": [
+          "scripts/vmware-tools.ps1"
+        ]
+      },
+      {
+        "type": "powershell",
+        "only": ["virtualbox-iso"],
+        "scripts": [
+          "scripts/virtualbox-guest-additions.ps1"
+        ]
+      },
+      {
+        "type": "windows-restart",
+        "restart_timeout": "30m"
+      },
+      {
+        "type": "powershell",
+        "scripts": [
+          "scripts/block-telemetry.ps1"
+        ]
+      },
+      {
+        "type": "powershell",
+        "scripts": [
+          "scripts/optimize-user-interface.ps1"
+        ]
+      },
+      {
+        "type": "powershell",
+        "scripts": [
+          "scripts/optimize-windows-update.ps1"
+        ]
+      },
+      {
+        "type": "powershell",
+        "scripts": [
+          "scripts/disable-services.ps1"
+        ]
+      },
+      {
+        "type": "powershell",
+        "scripts": [
+          "scripts/windows10Debloater.ps1"
+        ]
+      },
+      {
+        "type": "windows-restart",
+        "restart_timeout": "30m"
+      },
+      {
+        "type": "powershell",
+        "only": ["vmware-iso"],
+        "scripts": [
+          "scripts/win-update.ps1"
+        ]
+      }
+    ]
+}
