@@ -4,7 +4,7 @@
       "disk_size": "40960",
       "iso_checksum_type": "sha1",
       "iso_checksum": "62564786f5568b40385abb40a1a9bb889f3576c7",
-      "iso_url": "https://software-download.microsoft.com/pr/Win10_1803_French_x64.iso?t=7f84cbdf-5d98-4460-932e-387bd399491b&e=1525251776&h=54b8ccc9016f647bb02f3bcb6571b366",
+      "iso_url": "https://software-download.microsoft.com/pr/Win10_1803_French_x64.iso?t=380427eb-8eb4-49c9-9afd-48e326285c4f&e=1538038982&h=cc9a13f58840b011552299747b07110f",
       "memsize": "2048",
       "numvcpus": "2",
       "vm_name": "Win10_1803",
