@@ -117,12 +117,6 @@
       {
         "type": "powershell",
         "scripts": [
-          "scripts/disable-services.ps1"
-        ]
-      },
-      {
-        "type": "powershell",
-        "scripts": [
           "scripts/windows10Debloater.ps1"
         ]
       },
