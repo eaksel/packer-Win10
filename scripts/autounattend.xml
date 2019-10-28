@@ -85,7 +85,7 @@
         </component>
         <component xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
         <!-- https://docs.microsoft.com/en-us/windows-hardware/customize/desktop/unattend/microsoft-windows-shell-setup -->
-            <ComputerName>packer-win2016</ComputerName>
+            <ComputerName>packer-win10</ComputerName>
             <TimeZone>Romance Standard Time</TimeZone>
         </component>
         <component xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="Microsoft-Windows-ServerManager-SvrMgrNc" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
@@ -123,7 +123,7 @@
                     <PlainText>true</PlainText>
                 </Password>
                 <Enabled>true</Enabled>
-                <Username>packer</Username>
+                <Username>Administrator</Username>
             </AutoLogon>
             <FirstLogonCommands>
                 <SynchronousCommand wcm:action="add">
@@ -133,7 +133,7 @@
                     <RequiresUserInput>true</RequiresUserInput>
                 </SynchronousCommand>
                 <SynchronousCommand wcm:action="add">
-                    <CommandLine>%SystemRoot%\system32\WindowsPowerShell\v1.0\powershell.exe -Command New-SelfSignedCertificate -CertstoreLocation Cert:\LocalMachine\My -DnsName "packer"</CommandLine>
+                    <CommandLine>%SystemRoot%\system32\WindowsPowerShell\v1.0\powershell.exe -Command New-SelfSignedCertificate -CertstoreLocation Cert:\LocalMachine\My -DnsName "WinRMCertificate"</CommandLine>
                     <Description>Certificate for WinRM</Description>
                     <Order>2</Order>
                     <RequiresUserInput>true</RequiresUserInput>
@@ -145,60 +145,42 @@
                     <RequiresUserInput>true</RequiresUserInput>
                 </SynchronousCommand>
                 <SynchronousCommand wcm:action="add">
-                    <CommandLine>%SystemRoot%\system32\WindowsPowerShell\v1.0\powershell.exe -Command Remove-Item -Path WSMan:\Localhost\listener\listener* -Recurse</CommandLine>
-                    <Description>Disable insecure WinRM over HTTP</Description>
-                    <Order>4</Order>
-                    <RequiresUserInput>true</RequiresUserInput>
-                </SynchronousCommand>
-                <SynchronousCommand wcm:action="add">
-                    <CommandLine>%SystemRoot%\system32\WindowsPowerShell\v1.0\powershell.exe -Command ($a = gci Cert:\LocalMachine\My\) -and (New-Item -Path WSMan:\LocalHost\Listener -Transport HTTPS -Address * -CertificateThumbPrint $a.Thumbprint –Force)</CommandLine>
+                    <CommandLine>%SystemRoot%\system32\WindowsPowerShell\v1.0\powershell.exe -Command ($cert = gci Cert:\LocalMachine\My\) -and (New-Item -Path WSMan:\LocalHost\Listener -Transport HTTPS -Address * -CertificateThumbPrint $cert.Thumbprint –Force)</CommandLine>
                     <Description>Add HTTPS WinRM listener with previously generated certificate</Description>
-                    <Order>5</Order>
+                    <Order>4</Order>
                     <RequiresUserInput>true</RequiresUserInput>
                 </SynchronousCommand>
                 <SynchronousCommand wcm:action="add">
                     <CommandLine>%SystemRoot%\system32\WindowsPowerShell\v1.0\powershell.exe -Command New-NetFirewallRule -DisplayName 'Windows Remote Management (HTTPS-In)' -Name 'Windows Remote Management (HTTPS-In)' -Profile Any -LocalPort 5986 -Protocol TCP</CommandLine>
                     <Description>Add firewall exception to TCP port 5986 for WinRM over HTTPS</Description>
-                    <Order>6</Order>
-                    <RequiresUserInput>true</RequiresUserInput>
-                </SynchronousCommand>
-                <SynchronousCommand wcm:action="add">
-                    <CommandLine>%SystemRoot%\system32\WindowsPowerShell\v1.0\powershell.exe -Command Disable-NetFirewallRule -DisplayName 'Windows Remote Management (HTTP-In)'</CommandLine>
-                    <Description>Disable WinRM over HTTP firewall rule</Description>
-                    <Order>7</Order>
-                    <RequiresUserInput>true</RequiresUserInput>
-                </SynchronousCommand>
-                <SynchronousCommand wcm:action="add">
-                    <CommandLine>%SystemRoot%\system32\WindowsPowerShell\v1.0\powershell.exe -Command Set-Item WSMan:\localhost\MaxTimeoutms 1800000</CommandLine>
-                    <Description>WinRM MaxTimeoutms</Description>
-                    <Order>8</Order>
+                    <Order>5</Order>
                     <RequiresUserInput>true</RequiresUserInput>
                 </SynchronousCommand>
                 <SynchronousCommand wcm:action="add">
                     <CommandLine>%SystemRoot%\system32\WindowsPowerShell\v1.0\powershell.exe -Command Set-Item WSMan:\localhost\Service\Auth\Basic -Value $true</CommandLine>
                     <Description>Enable Basic authentication</Description>
-                    <Order>9</Order>
+                    <Order>6</Order>
                     <RequiresUserInput>true</RequiresUserInput>
                 </SynchronousCommand>
                 <SynchronousCommand wcm:action="add">
                     <CommandLine>%SystemRoot%\System32\reg.exe ADD HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced\ /v HideFileExt /t REG_DWORD /d 0 /f</CommandLine>
-                    <Order>10</Order>
+                    <Order>7</Order>
                     <Description>Show file extensions in Explorer</Description>
                 </SynchronousCommand>
                 <SynchronousCommand wcm:action="add">
                     <CommandLine>%SystemRoot%\System32\reg.exe ADD HKLM\SYSTEM\CurrentControlSet\Control\Power\ /v HibernateFileSizePercent /t REG_DWORD /d 0 /f</CommandLine>
-                    <Order>11</Order>
+                    <Order>8</Order>
                     <Description>Zero Hibernation File</Description>
                 </SynchronousCommand>
                 <SynchronousCommand wcm:action="add">
                     <CommandLine>%SystemRoot%\System32\reg.exe ADD HKLM\SYSTEM\CurrentControlSet\Control\Power\ /v HibernateEnabled /t REG_DWORD /d 0 /f</CommandLine>
-                    <Order>12</Order>
+                    <Order>9</Order>
                     <Description>Disable Hibernation Mode</Description>
                 </SynchronousCommand>
                 <SynchronousCommand wcm:action="add">
-                    <CommandLine>%SystemRoot%\system32\WindowsPowerShell\v1.0\powershell.exe -Command Set-LocalUser packer -PasswordNeverExpires $true</CommandLine>
-                    <Order>13</Order>
-                    <Description>Disable password expiration for packer user</Description>
+                    <CommandLine>%SystemRoot%\system32\WindowsPowerShell\v1.0\powershell.exe -Command Set-LocalUser Administrator -PasswordNeverExpires $true</CommandLine>
+                    <Order>10</Order>
+                    <Description>Disable password expiration for Administrator</Description>
                 </SynchronousCommand>
             </FirstLogonCommands>
             <OOBE>
@@ -215,18 +197,6 @@
                     <Value>packer</Value>
                     <PlainText>true</PlainText>
                 </AdministratorPassword>
-                <LocalAccounts>
-                    <LocalAccount wcm:action="add">
-                        <Password>
-                            <Value>packer</Value>
-                            <PlainText>true</PlainText>
-                        </Password>
-                        <Group>Administrators</Group>
-                        <DisplayName>Packer</DisplayName>
-                        <Name>packer</Name>
-                        <Description>Packer User</Description>
-                    </LocalAccount>
-                </LocalAccounts>
             </UserAccounts>
             <RegisteredOwner/>
         </component>
