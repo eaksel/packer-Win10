@@ -3,20 +3,19 @@
       "boot_wait": "5s",
       "disk_size": "40960",
       "iso_checksum_type": "sha1",
-      "iso_checksum": "b8a6ffac9e15240c39f2ed2b16204341f564208d",
-      "iso_url": "https://software-download.microsoft.com/download/pr/17763.1.180914-1434.rs5_release_CLIENTENTERPRISEEVAL_OEMRET_x64FRE_en-us.iso",
+      "iso_checksum": "D5B2F95E3DD658517FE7C14DF4F36DE633CA4845",
+      "iso_url": "http://cdn.digiboy.ir/?b=dlir-s3&f=SW_DVD5_WIN_ENT_LTSC_2019_64-bit_English_MLF_X21-96425.ISO",
       "memsize": "2048",
       "numvcpus": "2",
       "vm_name": "Win10_1809",
       "winrm_password" : "packer",
-      "winrm_username" : "packer"
+      "winrm_username" : "Administrator"
     },
     "builders": [
         {
           "type": "vmware-iso",
-          "guest_os_type": "windows9srv-64",
+          "guest_os_type": "windows9-64",
           "vm_name":"{{user `vm_name`}}",
-          "tools_upload_flavor": "",
           "boot_wait": "{{user `boot_wait`}}",
           "disk_size": "{{user `disk_size`}}",
           "disk_type_id": "0",
@@ -74,62 +73,60 @@
         }
     ],
     "provisioners": [
-      {
-        "type": "windows-restart",
-        "restart_timeout": "30m"
-      },
-      {
-        "type": "powershell",
-        "only": ["vmware-iso"],
-        "scripts": [
-          "scripts/vmware-tools.ps1"
-        ]
-      },
-      {
-        "type": "powershell",
-        "only": ["virtualbox-iso"],
-        "scripts": [
-          "scripts/virtualbox-guest-additions.ps1"
-        ]
-      },
-      {
-        "type": "windows-restart",
-        "restart_timeout": "30m"
-      },
-      {
-        "type": "powershell",
-        "scripts": [
-          "scripts/block-telemetry.ps1"
-        ]
-      },
-      {
-        "type": "powershell",
-        "scripts": [
-          "scripts/optimize-user-interface.ps1"
-        ]
-      },
-      {
-        "type": "powershell",
-        "scripts": [
-          "scripts/optimize-windows-update.ps1"
-        ]
-      },
-      {
-        "type": "powershell",
-        "scripts": [
-          "scripts/windows10Debloater.ps1"
-        ]
-      },
-      {
-        "type": "windows-restart",
-        "restart_timeout": "30m"
-      },
-      {
-        "type": "powershell",
-        "only": ["vmware-iso"],
-        "scripts": [
-          "scripts/win-update.ps1"
-        ]
-      }
+        {
+            "type": "powershell",
+            "only": [
+                "vmware-iso"
+            ],
+            "scripts": [
+                "scripts/vmware-tools.ps1"
+            ]
+        },
+        {
+            "type": "powershell",
+            "only": [
+                "virtualbox-iso"
+            ],
+            "scripts": [
+                "scripts/virtualbox-guest-additions.ps1"
+            ]
+        },
+        {
+            "type": "windows-restart",
+            "restart_timeout": "30m"
+        },
+        {
+            "type": "powershell",
+            "scripts": [
+                "scripts/win-update.ps1"
+            ]
+        },
+        {
+            "type": "windows-restart",
+            "restart_timeout": "30m"
+        },
+        {
+            "type": "powershell",
+            "scripts": [
+                "scripts/win-update.ps1"
+            ]
+        },
+        {
+            "type": "windows-restart",
+            "restart_timeout": "30m"
+        },
+        {
+            "type": "powershell",
+            "scripts": [
+                "scripts/optimize-user-interface.ps1"
+            ]
+        },
+        {
+            "type": "powershell",
+            "scripts": [
+                "scripts/cleanup.ps1"
+            ],
+            "pause_before": "1m"
+        }
     ]
 }
