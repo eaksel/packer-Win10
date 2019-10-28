@@ -33,15 +33,33 @@ packer build -only=virtualbox-iso win10.json
 
 *If you omit the keyword "-only=" images for both Workstation and Virtualbox will be created.*
 
-By default the .iso of Windows 10 is pulled from <https://software-download.microsoft.com/pr/Win10_1803_French_x64.iso?t=380427eb-8eb4-49c9-9afd-48e326285c4f&e=1538038982&h=cc9a13f58840b011552299747b07110f>
+By default the .iso of Windows 10 is pulled from <http://cdn.digiboy.ir/?b=dlir-s3&f=SW_DVD5_WIN_ENT_LTSC_2019_64-bit_English_MLF_X21-96425.ISO>
 
 You can change the URL to one closer to your build server. To do so change the **"iso_url"** parameter in the **"variables"** section of the debian9.json file.
 
 ```json
 {
   "variables": {
-      "iso_url": "https://software-download.microsoft.com/pr/Win10_1803_French_x64.iso?t=380427eb-8eb4-49c9-9afd-48e326285c4f&e=1538038982&h=cc9a13f58840b011552299747b07110f"
+      "iso_url": "http://cdn.digiboy.ir/?b=dlir-s3&f=SW_DVD5_WIN_ENT_LTSC_2019_64-bit_English_MLF_X21-96425.ISO"
 }
+```
+
+## Configuring Input/User Locale & Timezone
+
+To set the input/user locale and timezone according to your preferences edit the following file:
+
+* ".\packer-Win2019\scripts\autounattend.xml"
+
+```xml
+<settings pass="specialize">
+    <component xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="Microsoft-Windows-International-Core" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
+        <InputLocale>fr-FR</InputLocale>
+        <UserLocale>fr-FR</UserLocale>
+    </component>
+    <component xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
+        <TimeZone>Romance Standard Time</TimeZone>
+    </component>
+</settings>
 ```
 
 ## Default credentials
@@ -50,5 +68,4 @@ The default credentials for this VM image are:
 
 |Username|Password|
 |--------|--------|
-|packer|packer|
 |administrator|packer|
