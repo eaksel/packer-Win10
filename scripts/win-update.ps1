@@ -4,50 +4,32 @@
 $ProgressPreference = "SilentlyContinue"
 
 Write-Output "***** Starting PSWindowsUpdate Installation"
-# Install PSWindowsUpdate for scriptable Windows Updates
-$webDeployURL = "https://gallery.technet.microsoft.com/scriptcenter/2d191bcd-3308-4edd-9de2-88dff796b0bc/file/66095/1/PSWindowsUpdate_1.4.5.zip"
-$filePath = "$($env:TEMP)\PSWindowsUpdate.zip"
 
-(New-Object System.Net.WebClient).DownloadFile($webDeployURL, $filePath)
-
-Get-ChildItem $filePath
-if (Get-ChildItem $filePath) {
-    Write-Output "***** PSWindowsUpdate zip file downloaded successfully"
-}
-
-Expand-Archive $filePath -DestinationPath "C:\Program Files\WindowsPowerShell\Modules"
+Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
+Install-Module -Name PSWindowsUpdate -Force
 
 if (Get-ChildItem "C:\Program Files\WindowsPowerShell\Modules\PSWindowsUpdate") {
     Write-Output "***** PSWindowsUpdate installed successfully"
 }
 
-# Clean up
-Remove-Item -Force -Path $filePath
-
-Write-Output "***** Ended PSWindowsUpdate Installation"
-
 Write-Output "***** Starting Windows Update Installation"
 
-Try 
+Try
 {
     Import-Module PSWindowsUpdate -ErrorAction Stop
 }
 Catch
 {
-    Write-Error "***** Unable to install PSWindowsUpdate"
+    Write-Error "***** Unable to Import PSWindowsUpdate"
     exit 1
 }
 
 if (Test-Path C:\Windows\Temp\PSWindowsUpdate.log) {
-    # Save old logs
-    Rename-Item -Path C:\Windows\Temp\PSWindowsUpdate.log -NewName PSWindowsUpdate-$((Get-Date).Ticks).log
-
-    # Uncomment the line below to delete old logs instead
-    #Remove-Item -Path C:\Windows\Temp\PSWindowsUpdate.log
+    Remove-Item -Path C:\Windows\Temp\PSWindowsUpdate.log
 }
 
 try {
-    $updateCommand = {ipmo PSWindowsUpdate; Get-WUInstall -AcceptAll -IgnoreReboot | Out-File C:\Windows\Temp\PSWindowsUpdate.log}
+    $updateCommand = {Import-Module PSWindowsUpdate; Get-WUInstall -AcceptAll -Install -IgnoreReboot | Out-File C:\Windows\Temp\PSWindowsUpdate.log}
     $TaskName = "PackerUpdate"
 
     $User = [Security.Principal.WindowsIdentity]::GetCurrent()
