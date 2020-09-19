@@ -2,7 +2,6 @@
     "variables": {
       "boot_wait": "5s",
       "disk_size": "40960",
-      "iso_checksum_type": "sha1",
       "iso_checksum": "D5B2F95E3DD658517FE7C14DF4F36DE633CA4845",
       "iso_url": "http://cdn.digiboy.ir/?b=dlir-s3&f=SW_DVD5_WIN_ENT_LTSC_2019_64-bit_English_MLF_X21-96425.ISO",
       "memsize": "2048",
@@ -21,7 +20,6 @@
           "disk_type_id": "0",
           "headless": false,
           "http_directory": "http",
-          "iso_checksum_type": "{{user `iso_checksum_type`}}",
           "iso_checksum": "{{user `iso_checksum`}}",
           "iso_url": "{{user `iso_url`}}",
           "communicator":"winrm",
@@ -46,7 +44,6 @@
             "guest_os_type": "Windows2016_64",
             "vm_name": "{{user `vm_name`}}",
             "iso_url": "{{user `iso_url`}}",
-            "iso_checksum_type": "{{user `iso_checksum_type`}}",
             "iso_checksum": "{{user `iso_checksum`}}",
             "guest_additions_mode": "disable",
             "headless": false,

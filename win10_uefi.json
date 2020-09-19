@@ -1,8 +1,7 @@
 {
     "variables": {
-      "boot_wait": "2s",
+      "boot_wait": "5s",
       "disk_size": "40960",
-      "iso_checksum_type": "sha1",
       "iso_checksum": "D5B2F95E3DD658517FE7C14DF4F36DE633CA4845",
       "iso_url": "http://cdn.digiboy.ir/?b=dlir-s3&f=SW_DVD5_WIN_ENT_LTSC_2019_64-bit_English_MLF_X21-96425.ISO",
       "memsize": "2048",
@@ -22,7 +21,6 @@
           "disk_type_id": "0",
           "headless": false,
           "http_directory": "http",
-          "iso_checksum_type": "{{user `iso_checksum_type`}}",
           "iso_checksum": "{{user `iso_checksum`}}",
           "iso_url": "{{user `iso_url`}}",
           "communicator":"winrm",
@@ -49,7 +47,6 @@
             "vm_name": "{{user `vm_name`}}",
             "boot_command": ["<spacebar>"],
             "iso_url": "{{user `iso_url`}}",
-            "iso_checksum_type": "{{user `iso_checksum_type`}}",
             "iso_checksum": "{{user `iso_checksum`}}",
             "guest_additions_mode": "disable",
             "headless": false,
@@ -63,7 +60,6 @@
             "winrm_timeout": "4h",
             "shutdown_command": "shutdown /s /t 5 /f /d p:4:1 /c \"Packer Shutdown\"",
             "shutdown_timeout": "30m",
-            "skip_export": true,
             "iso_interface": "sata",
             "vboxmanage": [
               ["modifyvm", "{{.Name}}", "--memory", "{{user `memsize`}}"],
