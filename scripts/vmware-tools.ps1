@@ -1,14 +1,20 @@
 $ProgressPreference = "SilentlyContinue"
-$package = "VMware-tools-11.0.1-14773994-x86_64.exe"
-$url = "https://packages.vmware.com/tools/releases/11.0.1/windows/x64/$package"
 
-Write-Output "***** Downloading VMWare tools"
-Invoke-WebRequest $url -UseBasicParsing -OutFile "C:\Windows\Temp\$package"
+$webclient = New-Object System.Net.WebClient
+$version_url = "https://packages.vmware.com/tools/releases/latest/windows/x64/"
+$raw_package = $webclient.DownloadString($version_url)
+$raw_package -match "VMware-tools[\w-\d\.]*\.exe"
+$package = $Matches.0
 
-$exe = "C:\Windows\Temp\$package"
+$url = "https://packages.vmware.com/tools/releases/latest/windows/x64/$package"
+$exe = "$Env:TEMP\$package"
+
+Write-Output "***** Downloading VMware Tools"
+$webclient.DownloadFile($url, $exe)
+
 $parameters = '/S /v "/qn REBOOT=R ADDLOCAL=ALL"'
 
-Write-Output "***** Installing VMWare Guest Tools"
+Write-Output "***** Installing VMware Tools"
 Start-Process $exe $parameters -Wait
 
 Write-Output "***** Deleting $exe"
